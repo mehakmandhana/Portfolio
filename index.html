@@ -250,6 +250,13 @@
     .about-grid,.principles-grid{grid-template-columns:1fr;}
     .quote-card{position:static;margin-top:16px;right:0;}
     nav{padding:0 24px;}
+    .work-scroll{scroll-snap-type:x mandatory;}
+    .work-card{flex:0 0 85%;max-width:360px;scroll-snap-align:start;}
+    .work-scroll.nudge{animation:workNudge 0.9s ease-in-out 1;}
+    @keyframes workNudge{
+      0%,100%{transform:translateX(0);}
+      50%{transform:translateX(-46px);}
+    }
   }
   /* --- Password-gated Figma case study --- */
   .gate-overlay{
@@ -525,6 +532,27 @@
 </div>
 
 <script>
+  (function(){
+    var workScroll = document.querySelector('.work-scroll');
+    var workSection = document.getElementById('work');
+    if (!workScroll || !workSection) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!('IntersectionObserver' in window)) return;
+    var nudged = false;
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting && !nudged && window.innerWidth <= 900) {
+          nudged = true;
+          setTimeout(function(){
+            workScroll.classList.add('nudge');
+          }, 500);
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.4 });
+    observer.observe(workSection);
+  })();
+
   var navToggle = document.getElementById('navToggle');
   var navLinks = document.getElementById('navLinks');
 
